@@ -18,7 +18,8 @@ const App = () => {
   const [sortDate, setSortDate] = useState(false);
   const [sortAge, setSortAge] = useState(false);
   const [sortRace, setSortRace] = useState(false);
-  const [sortEth, sestSortEth] = useState(false);
+  const [sortEth, setSortEth] = useState(false);
+  const [sortDeath, setSortDeath] = useState(false);
   const [page, setPage] = useState(0);
   const [perPage, setPerPage] = useState(10);
   const [error, setError] = useState('');
@@ -71,13 +72,13 @@ const App = () => {
       <table>
         <thead>
           <tr>
-            <th>환자 ID</th>
-            <th>성별</th>
-            <th>생년월일</th>
-            <th>나이</th>
-            <th>인종</th>
-            <th>민족</th>
-            <th>사망 여부</th>
+            <th onClick={() => { if (sortId) { patiensts.sort((a: Patient, b: Patient) => { return a.personID - b.personID }) } else { patiensts.sort((a: Patient, b: Patient) => { return b.personID - a.personID }) }; setSortId(!sortId); }}>환자 ID</th>
+            <th onClick={() => { if (sortSex) { patiensts.sort((a: Patient, b: Patient) => { if (a.gender > b.gender) return 1; else return -1; }) } else { patiensts.sort((a: Patient, b: Patient) => { if (b.gender > a.gender) return 1; else return -1; }) }; setSortSex(!sortSex); }}>성별</th>
+            <th onClick={() => { if (sortDate) { patiensts.sort((a: Patient, b: Patient) => { if (a.birthDatetime > b.birthDatetime) return 1; else return -1; }) } else { patiensts.sort((a: Patient, b: Patient) => { if (b.birthDatetime > a.birthDatetime) return 1; else return -1; }) }; setSortDate(!sortDate); }}>생년월일</th>
+            <th onClick={() => { if (sortAge) { patiensts.sort((a: Patient, b: Patient) => { return a.age - b.age }) } else { patiensts.sort((a: Patient, b: Patient) => { return b.age - a.age }) }; setSortAge(!sortAge); }}>나이</th>
+            <th onClick={() => { if (sortRace) { patiensts.sort((a: Patient, b: Patient) => { if (a.race > b.race) return 1; else return -1; }) } else { patiensts.sort((a: Patient, b: Patient) => { if (b.race > a.race) return 1; else return -1; }) }; setSortRace(!sortRace); }}>인종</th>
+            <th onClick={() => { if (sortEth) { patiensts.sort((a: Patient, b: Patient) => { if (a.ethnicity > b.ethnicity) return 1; else return -1; }) } else { patiensts.sort((a: Patient, b: Patient) => { if (b.ethnicity > a.ethnicity) return 1; else return -1; }) }; setSortEth(!sortEth); }}>민족</th>
+            <th onClick={() => { if (sortDeath) { patiensts.sort((a: Patient, b: Patient) => { if (a.isDeath > b.isDeath) return 1; else return -1; }) } else { patiensts.sort((a: Patient, b: Patient) => { if (b.isDeath > a.isDeath) return 1; else return -1; }) }; setSortDeath(!sortDeath); }}>사망 여부</th>
           </tr>
         </thead>
         <tbody>
