@@ -9,3 +9,4 @@ export const genderList = () => api.get('/gender/list');
 export const raceList = () => api.get('/race/list');
 export const ethList = () => api.get('/ethnicity/list');
 export const detail = (id: number) => api.get(`/patient/brief/${id.toString()}`);
+export const chart = () => api.get('/patient/stats');

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { patientList, genderList, raceList, ethList, detail } from "../api";
+import Highcharts from 'highcharts'
+import HighchartsReact from 'highcharts-react-official'
+import { patientList, genderList, raceList, ethList, detail, chart } from "../api";
 
 interface Patient {
   personID: number;
@@ -15,6 +17,9 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [patiensts, setPatiensts] = useState([]);
   const [onePatient, setPatient] = useState<any>({});
+  const [sexChart, setSexChart] = useState({});
+  const [raceChart, setRaceChart] = useState({});
+  const [ethChart, setEthChart] = useState({});
   const [genders, setGenders] = useState([]);
   const [races, setRaces] = useState([]);
   const [eths, setEths] = useState([]);
@@ -45,10 +50,46 @@ const App = () => {
         const {
           data: { ethnicityList }
         } = await ethList();
+        const {
+          data: { stats }
+        } = await chart();
         setPatiensts(list.map((e: Patient) => { return { ...e, isOpen: false } }));
         setGenders(gender);
         setRaces(race);
         setEths(ethnicityList);
+        const sex = stats.map((p: any) => { return p.gender; });
+        const race1 = stats.map((p: any) => { return p.race; });
+        const eth = stats.map((p: any) => { return p.ethnicity; });
+
+
+
+        setSexChart({
+          title: {
+            text: 'Gender Chart'
+          },
+          series: [{
+            type: 'pie',
+            data: [sex.filter((p: string) => p === 'M').length, sex.filter((p: string) => p === 'F').length]
+          }]
+        });
+        setRaceChart({
+          title: {
+            text: 'Race Chart'
+          },
+          series: [{
+            type: 'pie',
+            data: [race1.filter((p: string) => p === 'other').length, race1.filter((p: string) => p === 'native').length, race1.filter((p: string) => p === 'black').length, race1.filter((p: string) => p === 'white').length, race1.filter((p: string) => p === 'asian').length]
+          }]
+        });
+        setEthChart({
+          title: {
+            text: 'Ethnicity Chart'
+          },
+          series: [{
+            type: 'pie',
+            data: [eth.filter((p: string) => p === 'hispanic').length, eth.filter((p: string) => p === 'nonhispanic').length]
+          }]
+        });
       } catch (e) {
         setError("can't get Data");
       } finally {
@@ -83,6 +124,18 @@ const App = () => {
   ) : (
     <>
       <h1>환자 데이터</h1>
+      <HighchartsReact
+        highcharts={Highcharts}
+        options={sexChart}
+      />
+      <HighchartsReact
+        highcharts={Highcharts}
+        options={raceChart}
+      />
+      <HighchartsReact
+        highcharts={Highcharts}
+        options={ethChart}
+      />
       <select
         value={perPage}
         onChange={handleChange}
