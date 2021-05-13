@@ -61,6 +61,19 @@ const App = () => {
         const race1 = stats.map((p: any) => { return p.race; });
         const eth = stats.map((p: any) => { return p.ethnicity; });
 
+        const sexArr: number[] = [];
+        gender.forEach((element: string) => {
+          sexArr.push(sex.filter((p: string) => p === element).length);
+        });
+        const race1Arr: number[] = [];
+        race.forEach((element: string) => {
+          race1Arr.push(race1.filter((p: string) => p === element).length);
+        });
+        const ethArr: number[] = [];
+        ethnicityList.forEach((element: string) => {
+          ethArr.push(eth.filter((p: string) => p === element).length);
+        });
+
 
 
         setSexChart({
@@ -69,7 +82,7 @@ const App = () => {
           },
           series: [{
             type: 'pie',
-            data: [sex.filter((p: string) => p === 'M').length, sex.filter((p: string) => p === 'F').length]
+            data: sexArr,
           }]
         });
         setRaceChart({
@@ -78,7 +91,7 @@ const App = () => {
           },
           series: [{
             type: 'pie',
-            data: [race1.filter((p: string) => p === 'other').length, race1.filter((p: string) => p === 'native').length, race1.filter((p: string) => p === 'black').length, race1.filter((p: string) => p === 'white').length, race1.filter((p: string) => p === 'asian').length]
+            data: race1Arr,
           }]
         });
         setEthChart({
@@ -87,7 +100,7 @@ const App = () => {
           },
           series: [{
             type: 'pie',
-            data: [eth.filter((p: string) => p === 'hispanic').length, eth.filter((p: string) => p === 'nonhispanic').length]
+            data: ethArr
           }]
         });
       } catch (e) {
