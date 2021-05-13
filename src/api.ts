@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://49.50.167.136:9871/api"
+  baseURL: process.env.REACT_APP_DB_HOST
 });
 
 export const patientList = () => api.get('/patient/list');
