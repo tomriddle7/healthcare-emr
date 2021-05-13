@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { patientList, genderList, raceList, ethList } from "../api";
+import { patientList, genderList, raceList, ethList, detail } from "../api";
 
 interface Patient {
   personID: number;
@@ -9,10 +9,12 @@ interface Patient {
   race: String;
   ethnicity: String;
   isDeath: boolean;
+  isOpen?: boolean;
 }
 const App = () => {
   const [loading, setLoading] = useState(true);
   const [patiensts, setPatiensts] = useState([]);
+  const [onePatient, setPatient] = useState<any>({});
   const [genders, setGenders] = useState([]);
   const [races, setRaces] = useState([]);
   const [eths, setEths] = useState([]);
@@ -43,7 +45,7 @@ const App = () => {
         const {
           data: { ethnicityList }
         } = await ethList();
-        setPatiensts(list);
+        setPatiensts(list.map((e: Patient) => { return { ...e, isOpen: false } }));
         setGenders(gender);
         setRaces(race);
         setEths(ethnicityList);
@@ -67,6 +69,11 @@ const App = () => {
       arr.push(i);
     }
     return arr;
+  }
+
+  const openPatient = async (id: number) => {
+    const { data } = await detail(id);
+    setPatient(data);
   }
 
   return loading ? (
@@ -168,17 +175,20 @@ const App = () => {
               else return false;
             }
             else return false;
-          }).slice(page * perPage, page * perPage + perPage).map((patient: Patient, i: number) => {
+          }).slice(page * perPage, page * perPage + perPage).map((patient: Patient) => {
             return (
-              <tr key={patient.personID}>
-                <td>{patient.personID}</td>
-                <td>{patient.gender}</td>
-                <td>{patient.birthDatetime}</td>
-                <td>{patient.age}</td>
-                <td>{patient.race}</td>
-                <td>{patient.ethnicity}</td>
-                <td>{patient.isDeath ? '사망' : '생존'}</td>
-              </tr>
+              <>
+                <tr key={patient.personID} onClick={() => { if (!patient.isOpen) { openPatient(patient.personID) } patient.isOpen = !patient.isOpen; const temp = [...patiensts]; setPatiensts(temp); }}>
+                  <td>{patient.personID}</td>
+                  <td>{patient.gender}</td>
+                  <td>{patient.birthDatetime}</td>
+                  <td>{patient.age}</td>
+                  <td>{patient.race}</td>
+                  <td>{patient.ethnicity}</td>
+                  <td>{patient.isDeath ? '사망' : '생존'}</td>
+                </tr>
+                {patient.isOpen === true ? <div>방문횟수: {onePatient.visitCount}, 진단정보: {onePatient.conditionList.join(', ')}</div> : null}
+              </>
             )
           })}
         </tbody>
