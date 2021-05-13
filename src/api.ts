@@ -5,3 +5,6 @@ const api = axios.create({
 });
 
 export const patientList = () => api.get('/patient/list');
+export const genderList = () => api.get('/gender/list');
+export const raceList = () => api.get('/race/list');
+export const ethList = () => api.get('/ethnicity/list');

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { patientList } from "../api";
+import { patientList, genderList, raceList, ethList } from "../api";
 
 interface Patient {
   personID: number;
@@ -13,6 +13,9 @@ interface Patient {
 const App = () => {
   const [loading, setLoading] = useState(true);
   const [patiensts, setPatiensts] = useState([]);
+  const [genders, setGenders] = useState([]);
+  const [races, setRaces] = useState([]);
+  const [eths, setEths] = useState([]);
   const [sortId, setSortId] = useState(false);
   const [sortSex, setSortSex] = useState(false);
   const [sortDate, setSortDate] = useState(false);
@@ -20,6 +23,7 @@ const App = () => {
   const [sortRace, setSortRace] = useState(false);
   const [sortEth, setSortEth] = useState(false);
   const [sortDeath, setSortDeath] = useState(false);
+  const [emrFilter, setEmrFilter] = useState<any>({ gender: '', age: 0, race: '', ethnicity: '', isDeath: '' });
   const [page, setPage] = useState(0);
   const [perPage, setPerPage] = useState(10);
   const [error, setError] = useState('');
@@ -30,8 +34,19 @@ const App = () => {
         const {
           data: { patient: { list } }
         } = await patientList();
+        const {
+          data: { genderList: gender }
+        } = await genderList();
+        const {
+          data: { raceList: race }
+        } = await raceList();
+        const {
+          data: { ethnicityList }
+        } = await ethList();
         setPatiensts(list);
-        getPageArr();
+        setGenders(gender);
+        setRaces(race);
+        setEths(ethnicityList);
       } catch (e) {
         setError("can't get Data");
       } finally {
@@ -80,9 +95,80 @@ const App = () => {
             <th onClick={() => { if (sortEth) { patiensts.sort((a: Patient, b: Patient) => { if (a.ethnicity > b.ethnicity) return 1; else return -1; }) } else { patiensts.sort((a: Patient, b: Patient) => { if (b.ethnicity > a.ethnicity) return 1; else return -1; }) }; setSortEth(!sortEth); }}>민족</th>
             <th onClick={() => { if (sortDeath) { patiensts.sort((a: Patient, b: Patient) => { if (a.isDeath > b.isDeath) return 1; else return -1; }) } else { patiensts.sort((a: Patient, b: Patient) => { if (b.isDeath > a.isDeath) return 1; else return -1; }) }; setSortDeath(!sortDeath); }}>사망 여부</th>
           </tr>
+          <tr>
+            <th></th>
+            <th>
+              <select
+                value={emrFilter.gender}
+                onChange={e => { setEmrFilter({ ...emrFilter, gender: e.target.value }); }}
+              >
+                <option value=''>전체</option>
+                {genders.map((gen: string, index: number) => {
+                  return (
+                    <option key={index} value={gen}>{gen}</option>
+                  )
+                })}
+              </select>
+            </th>
+            <th></th>
+            <th><input value={emrFilter.age} onChange={e => { setEmrFilter({ ...emrFilter, age: Number(e.target.value) }); }} /></th>
+            <th>
+              <select
+                value={emrFilter.race}
+                onChange={e => { setEmrFilter({ ...emrFilter, race: e.target.value }); }}
+              >
+                <option value=''>전체</option>
+                {races.map((ra: string, index: number) => {
+                  return (
+                    <option key={index} value={ra}>{ra}</option>
+                  )
+                })}
+              </select>
+            </th>
+            <th>
+              <select
+                value={emrFilter.ethnicity}
+                onChange={e => { setEmrFilter({ ...emrFilter, ethnicity: e.target.value }); }}
+              >
+                <option value=''>전체</option>
+                {eths.map((eth: string, index: number) => {
+                  return (
+                    <option key={index} value={eth}>{eth}</option>
+                  )
+                })}
+              </select>
+            </th>
+            <th>
+              <select
+                value={emrFilter.isDeath}
+                onChange={e => { setEmrFilter({ ...emrFilter, isDeath: e.target.value }); }}
+              >
+                <option value=''>전체</option>
+                <option value='false'>생존</option>
+                <option value='true'>사망</option>
+              </select>
+            </th>
+          </tr>
         </thead>
         <tbody>
-          {patiensts.slice(page * perPage, page * perPage + perPage).map((patient: Patient, i: number) => {
+          {patiensts.filter((p: Patient) => {
+            if (p.gender === emrFilter.gender || emrFilter.gender === '') {
+              if (p.age === emrFilter.age || emrFilter.age <= 0) {
+                if (p.race === emrFilter.race || emrFilter.race === '') {
+                  if (p.ethnicity === emrFilter.ethnicity || emrFilter.ethnicity === '') {
+                    if (p.isDeath.toString() === emrFilter.isDeath || emrFilter.isDeath === '') {
+                      return true;
+                    }
+                    else return false;
+                  }
+                  else return false;
+                }
+                else return false;
+              }
+              else return false;
+            }
+            else return false;
+          }).slice(page * perPage, page * perPage + perPage).map((patient: Patient, i: number) => {
             return (
               <tr key={patient.personID}>
                 <td>{patient.personID}</td>
